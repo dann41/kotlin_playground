@@ -64,9 +64,8 @@ fun TaxiPark.checkParetoPrinciple(): Boolean {
     val drivers20Percent = (allDrivers.size * 0.2).roundToInt()
 
     val incomeByMostSuccessful = trips.groupBy { trip -> trip.driver }
-            .map { (driver, trips) -> driver to trips.sumByDouble { it.cost } }
-            .sortedByDescending { (_, income) -> income }
-            .map { (_, income) -> income }
+            .map { (_, trips) -> trips.sumByDouble { it.cost } }
+            .sortedDescending()
             .take(drivers20Percent)
             .sum()
     return incomeByMostSuccessful >= (0.8 * totalIncome)
