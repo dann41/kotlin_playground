@@ -6,7 +6,7 @@ import kotlin.math.roundToInt
  * Task #1. Find all the drivers who performed no trips.
  */
 fun TaxiPark.findFakeDrivers(): Set<Driver> =
-        allDrivers.minus(trips.map { it.driver }.distinct())
+        allDrivers - trips.map { it.driver }
 
 /*
  * Task #2. Find all the clients who completed at least the given number of trips.
@@ -15,7 +15,7 @@ fun TaxiPark.findFaithfulPassengers(minTrips: Int): Set<Passenger> =
         allPassengers.map { passenger -> passenger to false }
                 .plus(trips.flatMap { trip -> trip.passengers.map { passenger -> passenger to true } })
                 .groupBy({ (passenger, _) -> passenger }, { (_, withTrip) -> withTrip })
-                .filter { (_, v) -> v.count { it } >= minTrips }
+                .filterValues { v -> v.count { it } >= minTrips }
                 .keys
 
 /*
@@ -25,7 +25,7 @@ fun TaxiPark.findFrequentPassengers(driver: Driver): Set<Passenger> =
         trips.filter { trip -> trip.driver == driver }
                 .flatMap { trip -> trip.passengers }
                 .groupBy { passenger -> passenger }
-                .filter { (_, v) -> v.size > 1 }
+                .filterValues { v -> v.size > 1 }
                 .keys
 
 
@@ -48,11 +48,9 @@ fun TaxiPark.findTheMostFrequentTripDurationPeriod(): IntRange? {
         return (divider..divider + 9)
     }
 
-    return trips.map { trip -> durationToRange(trip.duration) }
-            .groupBy { it }
-            .filter { (_, items) -> items.isNotEmpty() }
+    return trips.groupBy { trip -> durationToRange(trip.duration) }
             .maxBy { (_, items) -> items.size }
-            ?.component1()
+            ?.key
 }
 
 /*
